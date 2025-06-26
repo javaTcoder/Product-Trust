@@ -29,7 +29,7 @@ app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 app.use(fileUpload());
 app.use(errorMiddleware);
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+
 
 
 app.use("/api/v1", product);
@@ -38,7 +38,9 @@ app.use("/api/v1", order);
 app.use("/api/v1", payment);
 
 
-
+if (process.env.NODE_ENV !== "production") {
+  app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+}
 // http://localhost:5000 => backend,frontend
 
  if (process.env.NODE_ENV === "production") {
