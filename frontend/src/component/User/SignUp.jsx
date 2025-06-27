@@ -15,13 +15,16 @@ import { useDispatch, useSelector } from "react-redux";
 //import { useAlert } from "react-alert";
 import { toast } from "react-toastify";
 
-import { useHistory } from "react-router-dom";
 import useStyles from "./LoginFromStyle";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import { sendVerificationEmail } from "../../actions/emailVerificationAction"; // import this action
+
 
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import { Paper } from "@mui/material";
+
 
 function Signup() {
   const classes = useStyles();
@@ -35,18 +38,16 @@ function Signup() {
   const [isValidPassword, setIsValidPassword] = useState(true);
   const [avatar, setAvatar] = useState("");
   const [avatarPreview, setAvatarPreview] = useState("");
-  const [loading, setLoading] = useState(false);
 
   const [areCheckboxesChecked, setAreCheckboxesChecked] = useState({
     checkbox1: false,
     checkbox2: false,
   });
-  const history = useHistory();
 
   const dispatch = useDispatch();
   //const alert = useAlert();
+  const {loading, registrationSuccess, error } = useSelector((state) => state.userData);
 
-  const { isAuthenticated, error } = useSelector((state) => state.userData);
 
   useEffect(() => {
     if (error) {
@@ -54,11 +55,18 @@ function Signup() {
       dispatch(clearErrors());
     }
 
-    if (isAuthenticated) {
-      toast.success("User Registered Successfully");
-      history.push("/account");
+   
+  }, [dispatch, error]);
+
+    // Resend verification email handler
+  const handleResendVerification = () => {
+    if (email) {
+      dispatch(sendVerificationEmail(email));
+    } else {
+      toast.error("Please enter your email to resend verification.");
     }
-  }, [dispatch, isAuthenticated, loading, error, history]);
+  };
+
 
   const handleEmailChange = (event) => {
     const newEmail = event.target.value;
@@ -118,19 +126,16 @@ function Signup() {
   );
 
   function handleSignUpSubmit(e) {
-      setLoading(true);
     e.preventDefault();
   
 
     if (password !== confirmPassword) {
       toast.error("Password and Confirm Password do not match");
-      setLoading(false);
       return;
     }
 
     if (!avatar) {
     toast.error("Please upload a profile picture (avatar) to register.");
-    setLoading(false);
     return;
     }
 
@@ -141,7 +146,6 @@ function Signup() {
     formData.set("avatar", avatar);
 
     dispatch(signUp(formData));
-    setLoading(false);
   }
 
   return (
@@ -149,6 +153,31 @@ function Signup() {
       <MetaData title={"Sign Up"} />
       {loading ? (
         <CricketBallLoader />
+      ) : registrationSuccess ? (
+         <div className={classes.formContainer}>
+          <MetaData title="Registration Successful" />
+          <Paper className={classes.successPaper} elevation={5}> {/* Use Paper component with elevation */}
+            <Typography variant="h4" className={classes.heading}>
+              🎉 Registration Successful!
+            </Typography>
+
+            <Typography variant="body1" className={classes.bodyText}>
+              Please check your email to verify your account before logging in.
+            </Typography>
+
+            <Button
+              variant="contained"
+              className={classes.resendButton}
+              onClick={handleResendVerification}
+            >
+              Resend Verification Email
+            </Button>
+          </Paper>
+        </div>       
+      
+      
+      
+      
       ) : (
         <div className={classes.formContainer}>
           <form className={classes.form}>

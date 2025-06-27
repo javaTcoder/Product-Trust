@@ -63,7 +63,7 @@ export function login(email, password) {
     }
   };
 }
-// resgister user
+// register user
 export function signUp(signupData) {
 
   return async function (dispatch) {
@@ -79,7 +79,7 @@ export function signUp(signupData) {
         config
       );
 
-      dispatch({ type: REGISTER_USER_SUCCESS, payload: data.user });
+      dispatch({ type: REGISTER_USER_SUCCESS, payload: data.message });
 
 
 
