@@ -140,6 +140,10 @@ const Footer = () => {
 
   const currYear = new Date().getFullYear();
 
+    const handleFooterLinkClick = () => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+};
+
   return (
     <>
       <footer className="footer">
@@ -191,7 +195,7 @@ const Footer = () => {
                         const { id, link, path } = item;
                         return (
                           <li key={id}>
-                            <Link to={path}>{link}</Link>
+                            <Link to={path} onClick={handleFooterLinkClick}>{link}</Link>
                           </li>
                         );
                       })}
