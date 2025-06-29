@@ -4,8 +4,8 @@ import FacebookIcon from "@mui/icons-material/Facebook";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import GooglePlay from "../../../Image/Footer/google-play-black.svg";
-import AppStore from "../../../Image/Footer/app-store-black.svg";
+// import GooglePlay from "../../../Image/Footer/google-play-black.svg";
+// import AppStore from "../../../Image/Footer/app-store-black.svg";
 import "./Footer.css";
 const footMenu = [
   {
@@ -140,6 +140,8 @@ const Footer = () => {
 
   const currYear = new Date().getFullYear();
 
+
+  
     const handleFooterLinkClick = () => {
   window.scrollTo({ top: 0, behavior: "smooth" });
 };
@@ -156,7 +158,7 @@ const Footer = () => {
                     src={require("../../../Image/Footer/logo.png")}
                     alt="cricekt weapon logo"
                   />
-                  <h1 className="Foot_heading">Cricket Weapon</h1>
+                  {/* <h1 className="Foot_heading">Product Trust</h1> */}
                 </Link>
               </div>
 
@@ -208,7 +210,7 @@ const Footer = () => {
             <div className="foot_links foot3">
               <div className="foot_dowload_appLink">
                 <h5>Download app</h5>
-                <div className="app_links">
+                {/* <div className="app_links">
                   <span className="googlePlayStore_link">
                     <a href="/">
                       <img src={GooglePlay} alt="play Store svg" />
@@ -219,7 +221,7 @@ const Footer = () => {
                       <img src={AppStore} alt="Apple Store svg" />
                     </a>
                   </span>
-                </div>
+                </div> */}
               </div>
               {/* socila media link */}
 
@@ -269,7 +271,7 @@ const Footer = () => {
 
               <div className="foot_copyright">
                 <p>
-                  &copy; {currYear} | Cricket weapon, All Rights Reserved.
+                  &copy; {currYear} | Product Trust, All Rights Reserved.
                   <span>
                     <a href="iam-devesh.tech"> | Built by Iam_DEv</a>
                   </span>

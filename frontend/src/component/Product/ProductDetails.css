@@ -6,12 +6,12 @@
 }
 .product_container {
   margin-top: 7.5rem;
- width: 98vw;
-    height: fit-content;
- margin-right: auto; 
-    overflow: hidden !important;
-    font-family: "Roboto";
-      background: #f5f5f5;
+  width: 98vw;
+  height: fit-content;
+  margin-right: auto; 
+    /* overflow: hidden !important; */
+  font-family: "Roboto";
+  background: #f5f5f5;
     
 }
 

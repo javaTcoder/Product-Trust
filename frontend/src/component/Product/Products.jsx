@@ -83,6 +83,7 @@ function Products() {
       <MetaData title="PRODUCTS --Ecart" />
       <div className="productPage">
         <div className="prodcutPageTop">
+          {/* Filter Box remains here, fixed position */}
           <div className="filterBox">
             {/* Price Filter */}
             <div className="priceFilter">
@@ -109,9 +110,9 @@ function Products() {
                     IconComponent={ArrowDropDownIcon}
                     renderValue={(selected) => (selected !== "" ? selected : "min")}
                   >
+                    <MenuItem value={0} className="menu_item">0</MenuItem>
                     <MenuItem value={5000} className="menu_item">5000</MenuItem>
                     <MenuItem value={10000} className="menu_item">10000</MenuItem>
-                    <MenuItem value={0} className="menu_item">0</MenuItem>
                   </Select>
                   <span className="toText">to</span>
                   <Select
@@ -171,41 +172,44 @@ function Products() {
                 <FormControlLabel value="4" control={<Radio />} label="4★ & above" />
                 <FormControlLabel value="3" control={<Radio />} label="3★ & above" />
                 <FormControlLabel value="2" control={<Radio />} label="2★ & above" />
-                <FormControlLabel value="0" control={<Radio />} label="All" /> {/* Added 'All' option */}
+                <FormControlLabel value="0" control={<Radio />} label="All" />
               </RadioGroup>
             </div>
             <div className="filter_divider"></div>
           </div>
 
-          {loading ? (
-            <Loader />
-          ) : products && products.length > 0 ? (
-            <div className={products.length < 2 ? "products1" : "products"}>
-              {products.map((product) => (
-                <ProductCard key={product._id} product={product} />
-              ))}
-            </div>
-          ) : (
-            <div className="emptyProductsContainer"> {/* New class for empty product state */}
-              <InventoryIcon className="cartIcon" />
-              <Typography variant="h5" component="h1" className="cartHeading">
-                Product Not Found
-              </Typography>
-              <Typography variant="body" className="cartText">
-                Nothin' to see here.
-              </Typography>
-              <Typography variant="body" className="cartText">
-                There is no product with this name
-              </Typography>
-              <Button
-                className="shopNowButton"
-                onClick={() => window.location.reload()}
-                style={{ width: "7rem" }}
-              >
-                Refresh
-              </Button>
-            </div>
-          )}
+          {/* New wrapper for product content */}
+          <div className="productContentWrapper"> 
+            {loading ? (
+              <Loader />
+            ) : products && products.length > 0 ? (
+              <div className={products.length < 2 ? "products1" : "products"}>
+                {products.map((product) => (
+                  <ProductCard key={product._id} product={product} />
+                ))}
+              </div>
+            ) : (
+              <div className="emptyProductsContainer">
+                <InventoryIcon className="cartIcon" />
+                <Typography variant="h5" component="h1" className="cartHeading">
+                  Product Not Found
+                </Typography>
+                <Typography variant="body" className="cartText">
+                  Nothin' to see here.
+                </Typography>
+                <Typography variant="body" className="cartText">
+                  There is no product with this name
+                </Typography>
+                <Button
+                  className="shopNowButton"
+                  onClick={() => window.location.reload()}
+                  style={{ width: "7rem" }}
+                >
+                  Refresh
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
 
         {products && products.length > 0 && (

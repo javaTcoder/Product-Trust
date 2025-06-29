@@ -7,28 +7,12 @@
 
 .prodcutPageTop {
   display: flex;
-  width: auto;
-  gap: 1rem;
-  justify-content: space-around;
-  margin-bottom: 1rem;
   width: 100%; /* Ensure it takes full width */
-  align-items: flex-start; /* Align items to the top */
-}
-
-.products {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  height: fit-content;
-  width: 80%; /* Adjust width to make space for filterBox */
-}
-
-.products1 {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 60vw; /* Adjust width as needed */
-  margin: 1rem 0;
+  gap: 1rem;
+  justify-content: flex-start; /* Align items to the start to prevent shifting */
+  margin-bottom: 1rem;
+  padding: 0 1rem; /* Add some padding to the sides */
+  box-sizing: border-box; /* Include padding in the width calculation */
 }
 
 .filterBox {
@@ -36,31 +20,58 @@
   flex-direction: column;
   align-items: center;
   padding: 2rem;
-  width: 20%; /* Keep filter box width consistent */
-  margin: 1rem 0 0 0.8rem;
+  width: 250px; /* Fixed width for the filter box on larger screens */
+  flex-shrink: 0; /* Prevent filterBox from shrinking */
   background-color: white;
   border-radius: 5px;
   box-sizing: border-box;
   height: fit-content;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.329);
-  flex-shrink: 0; /* Prevent filterBox from shrinking */
 }
 
-/* New CSS for empty product container when filterBox is present */
+/* New wrapper for the dynamic content (products, loader, empty state) */
+.productContentWrapper {
+  flex-grow: 1; /* Allows this wrapper to take up all available space */
+  min-width: 0; /* Allows content to shrink if necessary */
+  display: flex; /* Apply flexbox to its children */
+  justify-content: center; /* Center products/loader/empty state horizontally */
+  align-items: flex-start; /* Align items to the top vertically */
+  min-height: 50vh; /* Ensure it has a minimum height */
+  /* No background/shadow here, as children will have it */
+}
+
+
+.products {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  height: fit-content;
+  width: 100%; /* Take full width of its parent (.productContentWrapper) */
+}
+
+.products1 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%; /* Take full width of its parent (.productContentWrapper) */
+  margin: 1rem 0;
+}
+
+/* Empty product container when filterBox is present */
 .emptyProductsContainer {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  flex-grow: 1; /* Allow it to take remaining space */
+  flex-grow: 1; 
   padding: 16px;
   box-sizing: border-box;
-  background: white; /* Ensure background is white */
+  background: white; 
   border-radius: 5px;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.329);
-  min-height: 60vh; /* Maintain a good height */
+  min-height: 60vh; 
   gap: 1rem;
-  margin-left: 1rem; /* Space from filter box */
+  width: 100%; /* Take full width of its parent (.productContentWrapper) */
 }
 
 .emptyProductsContainer .cartIcon {
@@ -87,14 +98,13 @@
   background-color: rgb(40, 38, 38);
   color: white;
   min-height: 48px;
-  width: 100%;
+  width: 7rem; /* Changed from 100% to a fixed width for better appearance */
   padding: 4px 16px;
 }
 
 .emptyProductsContainer .shopNowButton:hover {
   background-color: #ed1c24;
 }
-
 
 /* Existing styles for price filter, categories, ratings, and pagination */
 .priceFilter {
@@ -136,9 +146,9 @@
   background-color: #d7d5d2d4;
 }
 .menu_item {
-  color: black !important; /* Changed to black for better visibility */
-  background-color: white !important; /* Ensure background is white */
-  box-shadow: none !important; /* Removed box-shadow */
+  color: black !important;
+  background-color: white !important;
+  box-shadow: none !important;
 }
 
 
@@ -271,28 +281,28 @@
 
 @media screen and (max-width: 1100px) {
   .filterBox {
-    width: 30vmax;
+    width: 200px; /* Adjust fixed width for smaller screens */
   }
   .page-link {
     font: 300 1.2vmax "Roboto";
   }
   .products1 {
-    width: 55vw;
+    width: 100%; /* Ensure it takes full width of its parent */
   }
   .category-link {
     font: 400 1.3vmax "Roboto";
   }
   .emptyProductsContainer {
-    width: 60vw; /* Adjust width for smaller screens */
+    width: 100%; /* Ensure it takes full width of its parent */
   }
 }
 
 @media screen and (max-width: 800px) {
   .filterBox {
-    width: 40vmax;
+    width: 180px; /* Further adjust fixed width for even smaller screens */
   }
   .products1 {
-    width: 45vw;
+    width: 100%;
   }
 
   .page-link {
@@ -302,31 +312,37 @@
     font: 400 1.6vmax "Roboto";
   }
   .emptyProductsContainer {
-    width: 45vw; /* Adjust width for smaller screens */
+    width: 100%;
   }
 }
 
 @media screen and (max-width: 600px) {
   .prodcutPageTop {
-    flex-direction: column; /* Keep filter box on top, products below */
+    flex-direction: column; /* Stack filter box and product content vertically */
     align-items: center;
     margin-top: 10px;
+    padding: 0; /* Remove horizontal padding when stacked */
   }
   .filterBox {
     width: 90%; /* Full width for filter box on small screens */
-    margin: 1rem 0 0 0;
+    margin: 1rem 0; /* Add margin for spacing */
+  }
+
+  .productContentWrapper {
+    width: 90%; /* Full width for product content wrapper */
+    margin: 1rem 0; /* Add margin for spacing */
   }
 
   .products {
-    width: 90%; /* Adjust width for products on small screens */
-    margin: 1rem 0 0 0;
+    width: 100%; /* Take full width of its parent */
+    margin: 0; /* Remove specific margins, controlled by parent */
   }
   .products1 {
-    width: 90%; /* Adjust width for products on small screens */
-    margin: 1rem 0 0 0;
+    width: 100%; /* Take full width of its parent */
+    margin: 0; /* Remove specific margins, controlled by parent */
   }
   .emptyProductsContainer {
-    width: 90%; /* Full width for empty container on small screens */
-    margin: 1rem 0 0 0;
+    width: 100%; /* Take full width of its parent */
+    margin: 0; /* Remove specific margins, controlled by parent */
   }
 }
