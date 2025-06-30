@@ -117,13 +117,11 @@ export const load_UserProfile = () => async (dispatch) => {
       sessionStorage.setItem("user", JSON.stringify(data.user));
     }
   } catch (error) {
-  if (error.response && error.response.status === 401) {
-    // Show a custom message for unauthorized users
-      toast.info("Please login first.");
-    dispatch({ type: LOAD_USER_FAIL, payload: null });
+  if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+    dispatch(logout());
+    toast.info("Session expired, please log in again.");
   } else {
-    toast.error(error.message);
-    dispatch({ type: LOAD_USER_FAIL, payload: error.message });
+    dispatch({ type: LOGIN_FAIL, payload: error.message });
   }
 }
 };
