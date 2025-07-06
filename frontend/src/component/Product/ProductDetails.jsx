@@ -18,7 +18,7 @@ import "./ProductDetails.css";
 import { useSelector, useDispatch } from "react-redux";
 import { useRouteMatch } from "react-router-dom";
 import useActive from "../hook/useActive";
-import ReviewCard from "./ReviewCard";
+import ReviewCard from "../Review/ReviewCard";
 import {
   clearErrors,
   getProductDetails,

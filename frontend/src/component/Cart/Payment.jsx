@@ -50,34 +50,37 @@ const useStyles = makeStyles((theme) => ({
     padding: "1rem 0",
     width: "100%",
     backgroundColor: "white",
-    overFlow : "hidden",
+    //overFlow : "hidden",
   },
 
   paymentPage__container: {
     display: "flex",
     width: "100%",
-    boxSize: "border-box",
-    justifyContent: "space-around",
+    maxWidth: "100vw", // Prevent overflow
+    boxSizing: "border-box",
+    justifyContent: "space-between",
+  alignItems: "flex-start",
+  gap: "2rem",
     [theme.breakpoints.down("sm")]: {
-      flexDirection: "column-reverse",
-      alignItems: "center",
-    },
+    flexDirection: "column",
+    alignItems: "stretch",
+    gap: "1rem",
+    padding: "0 0.5rem",
+    width: "100vw",      // Ensure full viewport width
+    maxWidth: "100vw",   // Prevent horizontal scroll
+    boxSizing: "border-box",
+  },
   },
 
-  PaymentBox: {
-    padding: "1rem",
-    display: "flex",
-    flexDirection: "column",
-    paddingLeftLeft: "0.5rem",
-    overFlow: "hidden",
-    backgroundColor: "white",
-    width: "50%",
-    [theme.breakpoints.down("sm")]: {
-      width: "90%",
-      marginTop: "1rem",
-      padding: "2rem",
-    },
+   PaymentBox: {
+  width: "55%",
+  minWidth: 0,
+  [theme.breakpoints.down("sm")]: {
+    width: "100%",
+    minWidth: 0,
+    padding: "0",
   },
+},
   PaymentHeading: {
     fontWeight: "800",
     marginBottom: "1rem",
@@ -125,9 +128,9 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   cardDetails: {
-    width: "100%%",
+    width: "100%",
     "& .MuiGrid-item": {
-      marginBottom: "0.5rem",
+      marginBottom: "1rem", // 👈 add bottom spacing
     },
   },
   labelText: {
@@ -208,78 +211,77 @@ const useStyles = makeStyles((theme) => ({
       color: "red",
     },
   },
-  paymentInput: {
-    width: "95%",
-    padding: "18.5px 14px",
-    border: "1px solid #000",
-  },
-  paymentInput2: {
-    width: "90%",
-    padding: "18.5px 14px",
-    border: "1px solid #000",
-  },
-  cardNumberInput: {
-    position: "relative",
-    "& .MuiOutlinedInput-root": {
-      "& fieldset": {
-        borderColor: "#000",
-        borderRadius: "none !important",
-      },
-      "&:hover fieldset": {
-        borderColor: "#000",
-        "&.Mui-focused fieldset": {
-          borderColor: "#000",
-        },
-      },
-    },
-  },
-  expiryInput: {
-    position: "relative",
-    "& .MuiOutlinedInput-root": {
-      "& fieldset": {
-        borderColor: "#000",
-        borderRadius: "none !important",
-      },
-      "&:hover fieldset": {
-        borderColor: "#000",
-        "&.Mui-focused fieldset": {
-          borderColor: "#000",
-        },
-      },
-    },
-  },
-  cvvInput: {
-    position: "relative",
-  },
+paymentInput: {
+  width: "100%",
+  minWidth: "320px",      // Make the card number box wider
+  padding: "18px 18px",
+  paddingRight: "50px",
+  border: "1.5px solid #000",
+  borderRadius: "8px",
+  boxSizing: "border-box",
+  fontSize: "1.3rem",     // Larger font
+  height: "56px",         // Taller input
+  background: "#fff",
+  marginBottom: "1rem",
+},
+paymentInput2: {
+  width: "100%",
+  minWidth: "140px",      // Wider for expiry and CVV
+  padding: "18px 18px",
+  paddingRight: "50px",
+  border: "1.5px solid #000",
+  borderRadius: "8px",
+  boxSizing: "border-box",
+  fontSize: "1.2rem",
+  height: "56px",
+  background: "#fff",
+  marginBottom: "1rem",
+},
+cardNumberInput: {
+  position: "relative",
+  width: "100%",
+  marginBottom: "1.5rem",
+  minWidth: "320px",
+  display: "flex",
+  alignItems: "center",
+},
+expiryInput: {
+  position: "relative",
+  minWidth: "140px",
+  marginRight: "1rem",
+},
+cvvInput: {
+  position: "relative",
+  minWidth: "140px",
+},
 
   inputIcon: {
     position: "absolute",
     top: "50%",
-    right: "1rem",
+    right: "12px",
     transform: "translateY(-50%)",
+    pointerEvents: "none",
+    zIndex: 2,
     color: "#00000080",
-    cursor: "pointer",
   },
 
   payemntAmount: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-end",
-    height: "fit-content",
-    padding: "1rem 0.5rem 0 0.5rem",
-    width: "40%",
-    [theme.breakpoints.down("sm")]: {
-      width: "90%",
-      padding: "2rem",
-    },
+  width: "45%",
+  minWidth: 0,
+  [theme.breakpoints.down("sm")]: {
+    width: "100%",
+    minWidth: 0,
+    padding: "0",
   },
+},
+  
   order_Details: {
     display: "flex",
     flexDirection: "column",
     width: "100%",
     padding: "2rem 0.5rem 2rem 0.5rem",
     [theme.breakpoints.down("sm")]: {
-      width: "90%",
+      width: "100%",
       padding: "2rem",
     },
   },
@@ -351,6 +353,7 @@ const PaymentComponent = () => {
   const [couponCode, setCouponCode] = useState("");
   const [isValid, setIsValid] = useState(true);
     const [showDummyCard, setShowDummyCard] = useState(false);
+    const [selectedPayment, setSelectedPayment] = useState("card");
 
 
   const subTotal = cartItems.reduce((acc, currItem) => {
@@ -402,10 +405,20 @@ const PaymentComponent = () => {
 
   async function paymentSubmitHandler(e) {
     e.preventDefault();
+    if (selectedPayment === "cod") {
+    dispatch(createOrder({ ...order, paymentInfo: { id: "COD", status: "Pending" } }));
+    toast.success("Order placed with Cash on Delivery!");
+    history.push("/success");
+    return;
+    }
     if(nameOnCard === ""){
       toast.error("Please enter name on card");
       return;
     }
+
+    const confirm = window.confirm("Are you sure you want to place the order and pay with your card?");
+    if (!confirm) 
+      return;
 
     try {
       const config = {
@@ -558,7 +571,7 @@ const PaymentComponent = () => {
                       />
                     </Grid>
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item xs={12} sm={6}>
                     <Typography
                       variant="subtitle2"
                       className={classes.labelText}
@@ -570,7 +583,7 @@ const PaymentComponent = () => {
                       <CardExpiryElement className={classes.paymentInput2} />
                     </div>
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item xs={12} sm={6}>
                     <Typography
                       variant="subtitle2"
                       className={classes.labelText}
@@ -602,6 +615,19 @@ const PaymentComponent = () => {
                 </Grid>
               </div>
 
+
+              <div className={classes.cardSelection}>
+                <Radio
+                  value="card"
+                  className={classes.radio}
+                  checked={selectedPayment === "card"}
+                  onChange={() => setSelectedPayment("card")}
+                />
+                <Typography variant="subtitle2" className={classes.radioText}>
+                  Credit Card
+                </Typography>
+                <CreditCardIcon fontSize="medium" />
+              </div>
               <div className={classes.cardSelection}>
                 <Radio
                   value="dummyCard"
@@ -615,13 +641,25 @@ const PaymentComponent = () => {
                 <CreditCardIcon fontSize="medium" />
                 {showDummyCard && <DummyCard onClose={handleCloseDummyCard} />}
               </div>
+
+              <div className={classes.cardSelection}>
+                <Radio
+                  value="cod"
+                  className={classes.radio}
+                  checked={showDummyCard === false && selectedPayment === "cod"}
+                  onChange={() => setSelectedPayment("cod")}
+                />
+                <Typography variant="subtitle2" className={classes.radioText}>
+                  Cash on Delivery (COD)
+                </Typography>
+              </div>
               <Typography
                 variant="body2"
                 className={classes.termsAndConditionsText}
               >
                 By clicking "Place Order", you agree to our
                 <Link href="#" className={classes.privacyText}>
-                  Cricket Weapon Terms & Conditions
+                  Product Trust Terms & Conditions
                 </Link>
               </Typography>
               <Button

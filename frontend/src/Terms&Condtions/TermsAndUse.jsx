@@ -1,10 +1,11 @@
 import React from "react";
-import "./Privacy.css";
+import "./TermsAndUse.css";
 import MetaData from "../component/layouts/MataData/MataData";
 const TermsAndConditions = () => {
   return (
     <div className="privacy-policy-container">
       <MetaData title="Terms And Conditions" />
+      
       <div className="container___">
         <h1>Terms and Conditions of Sale</h1>
         <p>

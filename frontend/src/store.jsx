@@ -4,11 +4,8 @@ import { composeWithDevTools } from "redux-devtools-extension";
 import {
   productsReducer,
   productDetailsReducer,
-  newReviewReducer,
   newProductReducer,
   deleteUpdateReducer,
-   getALLReviewReducer,
-   deleteReviewReducer
 } from "./reducers/productReducers";
 import {
   profileReducer,
@@ -17,6 +14,14 @@ import {
   userDetailsReducer,
   allUsersReducer,
 } from "./reducers/userReducer";
+
+
+import {
+  newReviewReducer,
+   getALLReviewReducer,
+   deleteReviewReducer,
+   editReviewReducer
+} from "./reducers/reviewReducers";
 
 import { cartReducer } from "./reducers/cartReducer";
 import {

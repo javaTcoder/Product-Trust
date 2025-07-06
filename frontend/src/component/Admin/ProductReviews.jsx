@@ -8,7 +8,7 @@ import {
   getAllreviews,
   clearErrors,
   deleteProductReview,
-} from "../../actions/productAction";
+} from "../../actions/reviewActions";
 import {useHistory } from "react-router-dom";
 import MetaData from "../layouts/MataData/MataData";
 import Loader from "../layouts/loader/Loader";
@@ -27,7 +27,7 @@ import { makeStyles } from "@mui/styles";
 
 import Navbar from "./Navbar";
 import Sidebar from "./Siderbar";
-import { DELETE_REVIEW_RESET } from "../../constants/productsConstatns";
+import { DELETE_REVIEW_RESET } from "../../constants/reviewConstants";
 
 import StarRateIcon from "@mui/icons-material/StarRate";
 
@@ -203,7 +203,7 @@ function ProductReviews() {
 
   useEffect(() => {
     if (productId.length === 24) {
-      dispatch(getAllreviews(productId)); // when in input box string lenght goes ===24 then automatically search occures
+      dispatch(getAllreviews(productId.trim())); // when in input box string lenght goes ===24 then automatically search occures
     }
 
     if (error) {
@@ -374,7 +374,7 @@ function ProductReviews() {
                     label="Product Id"
                     required
                     value={productId}
-                    onChange={(e) => setProductId(e.target.value)}
+                    onChange={(e) => setProductId(e.target.value.trim())}
                     InputProps={{
                       endAdornment: (
                         <InputAdornment position="end">
