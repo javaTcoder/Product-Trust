@@ -209,7 +209,7 @@ const Footer = () => {
 
             <div className="foot_links foot3">
               <div className="foot_dowload_appLink">
-                <h5>Download app</h5>
+                {/* <h5>Download app</h5> */}
                 {/* <div className="app_links">
                   <span className="googlePlayStore_link">
                     <a href="/">
