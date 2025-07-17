@@ -23,6 +23,8 @@ const product = require("./route/productRoute")
 const payment = require("./route/paymentRoute");
 const emailVerification = require("./route/emailVerificationRoute");
 const review = require("./route/reviewRoutes");
+const support = require("./route/supportRoute");
+const abusiveReport = require("./route/abusiveReportRoute");
 
 // for req.cookie to get token while autentication
 app.use(cookieParser());
@@ -33,6 +35,8 @@ app.use(fileUpload());
 app.use(errorMiddleware);
 app.use("/api/v1", emailVerification);
 app.use("/api/v1", review);
+app.use("/api/v1", support);
+app.use("/api/v1", abusiveReport);
 // app.use("/api/v1", emailVerification); // for email verification
 
 

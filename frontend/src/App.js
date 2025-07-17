@@ -10,7 +10,9 @@ import PrivateRoute from "./component/Route/PrivateRoute";
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import "./App.css";
 import VerifyEmail from "./component/User/VerifyEmail";
-
+import SupportRequests from "./component/Admin/SupportRequests";
+import AbusiveReports from "./component/Admin/AbusiveReports";
+import FAQs from "./Terms&Condtions/FAQs";
 
 import Header from "./component/layouts/Header1.jsx/Header";
 import Payment from "./component/Cart/Payment";
@@ -413,6 +415,19 @@ function App() {
               </>
             )}
           />
+
+          <Route
+            exact
+            path="/FAQs"
+            render={() => (
+              <>
+                {<Header />}
+                <FAQs />
+
+                {<Footer />}
+              </>
+            )}
+          />
         </Switch>
 
         {/* Admin routes */}
@@ -471,6 +486,19 @@ function App() {
               exact
               path="/admin/user/:id"
               component={LazyUpdateUser}
+            />
+
+            <PrivateRoute
+              isAdmin={true}
+              exact
+              path="/admin/support-requests"
+              component={SupportRequests}
+            />
+            <PrivateRoute
+              isAdmin={true}
+              exact
+              path="/admin/abusive-reports"
+              component={AbusiveReports}
             />
           </Switch>
         </Suspense>

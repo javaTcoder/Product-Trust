@@ -204,7 +204,29 @@ function accountHandler() {
                   <span className={classes.sideBarMenuItem_text}>Contact</span>
                 </li>
               </Link>
+
+              <Link
+                to="/admin/support-requests"
+                style={{ color: "inherit", textDecoration: "none" }}
+              >
+                <li className={classes.sideBarMenuItem}>
+                  <ListAltIcon fontSize="large" />
+                  <span className={classes.sideBarMenuItem_text}>Support Requests</span>
+                </li>
+              </Link>
+
+              <Link
+                to="/admin/abusive-reports"
+                style={{ color: "inherit", textDecoration: "none" }}
+              >
+                <li className={classes.sideBarMenuItem}>
+                  <ListAltIcon fontSize="large" />
+                  <span className={classes.sideBarMenuItem_text}>Abusive Reports</span>
+                </li>
+              </Link>
             </ul>
+
+            
             <div className={classes.divider} />
             <Button
               className={classes.button}
