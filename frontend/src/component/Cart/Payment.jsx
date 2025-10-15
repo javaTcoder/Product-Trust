@@ -405,7 +405,7 @@ const PaymentComponent = () => {
     e.preventDefault();
 
     const backendBase =
-      process.env.REACT_APP_BACKEND_URL || `${window.location.protocol}//${window.location.hostname}:5000`;
+      process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
 
     // 1. Handle PhonePe payment
     if (selectedPayment === "phonepe") {
