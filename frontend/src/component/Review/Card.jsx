@@ -10,6 +10,9 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import IconButton from "@mui/material/IconButton";
+import Dialog from "@mui/material/Dialog";
+import DialogContent from "@mui/material/DialogContent";
+import CloseIcon from "@mui/icons-material/Close";
 import { useDispatch, useSelector } from "react-redux";
 import { likeDislikeReview, getAllreviews } from "../../actions/reviewActions";
 
@@ -106,8 +109,13 @@ const MyCard = ({ review , onEdit, onDelete, isOwnReview}) => {
   const dispatch = useDispatch();
   const { user, loading } = useSelector((state) => state.userData);
 
-
+  // const [helpful, setHelpful] = useState(10);
+  // const [unhelpful, setUnHelpful] = useState(5);
+  // const [helpfulClicked, setHelpfulClicked] = useState(false);
+  // const [unhelpfulClicked, setUnhelpfulClicked] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [openZoom, setOpenZoom] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
  // Likes/dislikes state from review arrays
   const likes = review.likes ? review.likes.length : 0;
   const dislikes = review.dislikes ? review.dislikes.length : 0;
@@ -130,9 +138,32 @@ const MyCard = ({ review , onEdit, onDelete, isOwnReview}) => {
     });
   };
  
-  
+  // const helpfulHandler = (type) => {
+  //   if (type === "up" && !helpfulClicked) {
+  //     setHelpful(helpful + 1);
+  //     setHelpfulClicked(true);
 
+  //     if (unhelpfulClicked) {
+  //       setUnHelpful(unhelpful - 1);
+  //       setUnhelpfulClicked(false);
+  //     }
+  //   } else if (type === "down" && !unhelpfulClicked) {
+  //     setUnHelpful(unhelpful + 1);
+  //     setUnhelpfulClicked(true);
 
+  //     if (helpfulClicked) {
+  //       setHelpful(helpful - 1);
+  //       setHelpfulClicked(false);
+  //     }
+  //   }
+  // };
+
+  // const handleMenuOpen = (event) => {
+  //   setAnchorEl(event.currentTarget);
+  // };
+  // const handleMenuClose = () => {
+  //   setAnchorEl(null);
+  // };
 
     // Add this handler:
   const handleFlagAbuse = async () => {
@@ -166,14 +197,16 @@ const MyCard = ({ review , onEdit, onDelete, isOwnReview}) => {
   return (
     <div className={classes.cardRoot}>
       <div className={classes.cardheader}>
-        <Avatar
-          alt="User Avatar"
-          src={review.user.avatar.url || "https://i.imgur.com/JSW6mEk.png"}
-          className={classes.avatar}
-        />
-        <Typography variant="body1" className={classes.subHeadings}>
-          {review.name || (review.user && review.user.name) || "User"}
-        </Typography>
+      <Avatar
+        alt={review.name || review.user?.name || "User"}
+        src={review.user?.avatar?.url || review.avatar || "https://i.imgur.com/JSW6mEk.png"}
+        className={classes.avatar}
+      />
+
+      <Typography variant="body1" className={classes.subHeadings}>
+        {review.name || review.user?.name || "User"}
+      </Typography>
+
         <Typography
           variant="body1"
           color="textSecondary"
@@ -203,6 +236,11 @@ const MyCard = ({ review , onEdit, onDelete, isOwnReview}) => {
                 </>
               ) : (
                 <MenuItem
+                  // onClick={() => {
+                  //   handleMenuClose();
+                  //   // You can add your flag/report logic here
+                  //   alert("Flagged as abusive or inappropriate!");
+                  // }}
                   onClick={handleFlagAbuse}
                 >
                   Flag as abusive or inappropriate
@@ -216,7 +254,11 @@ const MyCard = ({ review , onEdit, onDelete, isOwnReview}) => {
       </div>
       <div>
         <Rating
-          value={review.ratings}
+          value={
+            review && review.ratings !== undefined && review.ratings !== null
+              ? Number(review.ratings) || 0
+              : 0
+          }
           precision={0.5}
           size="midium"
           readOnly
@@ -229,6 +271,48 @@ const MyCard = ({ review , onEdit, onDelete, isOwnReview}) => {
       <Typography variant="body1" className={classes.commentTxt}>
         {review.comment}
       </Typography>
+      {/* Render review images here */}
+      {review.images && review.images.length > 0 && (
+        <div style={{ margin: "1rem 0", display: "flex", gap: "8px" }}>
+          {review.images.map((img, idx) => (
+            <img
+              key={idx}
+              src={img.url || img}
+              alt={`review-img-${idx}`}
+              style={{ width: 100, borderRadius: 8, cursor: "pointer" }}
+              onClick={() => {
+                setSelectedImage(img.url || img);
+                setOpenZoom(true);
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Zoom dialog */}
+      <Dialog
+        open={openZoom}
+        onClose={() => setOpenZoom(false)}
+        maxWidth="lg"
+        aria-labelledby="zoom-dialog"
+      >
+        <DialogContent style={{ position: "relative", padding: 8 }}>
+          <IconButton
+            aria-label="close"
+            onClick={() => setOpenZoom(false)}
+            style={{ position: "absolute", right: 8, top: 8, zIndex: 10 }}
+          >
+            <CloseIcon />
+          </IconButton>
+          {selectedImage && (
+            <img
+              src={selectedImage}
+              alt="zoomed-review"
+              style={{ maxWidth: "100%", maxHeight: "80vh", display: "block", margin: "0 auto" }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
       <Typography variant="body1" className={classes.recommend}>
         Would you recommend this product?{" "}
         <span className={review.recommend ? classes.yes : classes.no}>
@@ -261,3 +345,4 @@ const MyCard = ({ review , onEdit, onDelete, isOwnReview}) => {
   );
 };
 export default MyCard;
+

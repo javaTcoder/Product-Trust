@@ -23,13 +23,21 @@ const footMenu = [
         path: "/FAQs",
       },
 
-     
+      // {
+      //   id: 3,
+      //   link: "Cancel Order",
+      //   path: "/policy/return",
+      // },
       {
         id: 4,
         link: "Return Order",
         path: "/policy/return",
       },
-    
+      // {
+      //   id: 5,
+      //   link: "Warranty Info",
+      //   path: "/policy/Terms",
+      // },
     ],
   },
   {
@@ -41,7 +49,16 @@ const footMenu = [
         link: "Return Policy",
         path: "/policy/return",
       },
-      
+      // {
+      //   id: 2,
+      //   link: "Security",
+      //   path: "/policy/privacy",
+      // },
+      {
+       id: 3,
+         link: "Sitemap",
+         path: "/policy/Terms",
+       },
       {
         id: 4,
         link: "Privacy Policy",
@@ -73,7 +90,16 @@ const footMenu = [
         link: "Service Centres",
         path: "/",
       },
-      
+      // {
+      //   id: 4,
+      //   link: "Careers",
+      //   path: "/",
+      // },
+      // {
+      //   id: 5,
+      //   link: "Affiliates",
+      //   path: "/terms/conditions",
+      // },
     ],
   },
 ];
@@ -114,9 +140,7 @@ const Footer = () => {
 
   const currYear = new Date().getFullYear();
 
-
-  
-    const handleFooterLinkClick = () => {
+  const handleFooterLinkClick = () => {
   window.scrollTo({ top: 0, behavior: "smooth" });
 };
 
@@ -171,7 +195,9 @@ const Footer = () => {
                         const { id, link, path } = item;
                         return (
                           <li key={id}>
-                            <Link to={path} onClick={handleFooterLinkClick}>{link}</Link>
+                            <Link to={path} onClick={handleFooterLinkClick}>
+                              {link}
+                            </Link>
                           </li>
                         );
                       })}
@@ -182,9 +208,9 @@ const Footer = () => {
             </div>
 
             <div className="foot_links foot3">
-              <div className="foot_dowload_appLink">
-                {/* <h5>Download app</h5> */}
-                {/* <div className="app_links">
+              {/* <div className="foot_dowload_appLink">
+                <h5>Download app</h5>
+                <div className="app_links">
                   <span className="googlePlayStore_link">
                     <a href="/">
                       <img src={GooglePlay} alt="play Store svg" />
@@ -195,8 +221,8 @@ const Footer = () => {
                       <img src={AppStore} alt="Apple Store svg" />
                     </a>
                   </span>
-                </div> */}
-              </div>
+                </div>
+              </div> */}
               {/* socila media link */}
 
               <div className="foot_social">

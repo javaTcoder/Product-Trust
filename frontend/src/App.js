@@ -10,9 +10,6 @@ import PrivateRoute from "./component/Route/PrivateRoute";
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import "./App.css";
 import VerifyEmail from "./component/User/VerifyEmail";
-import SupportRequests from "./component/Admin/SupportRequests";
-import AbusiveReports from "./component/Admin/AbusiveReports";
-import FAQs from "./Terms&Condtions/FAQs";
 
 import Header from "./component/layouts/Header1.jsx/Header";
 import Payment from "./component/Cart/Payment";
@@ -38,7 +35,11 @@ import AboutUsPage from "./Terms&Condtions/Aboutus";
 import ReturnPolicyPage from "./Terms&Condtions/Return";
 import TermsUse from "./Terms&Condtions/TermsAndUse";
 import TermsAndConditions from "./Terms&Condtions/TermsCondtion";
+import FAQs from "./Terms&Condtions/FAQs";
 import PrivacyPolicy from "./Terms&Condtions/Privacy";
+import SupportRequests from "./component/Admin/SupportRequests";
+import AbusiveReports from "./component/Admin/AbusiveReports";
+
 // const LazyPayment = React.lazy(() => import("./component/Cart/Payment"));
 const LazyDashboard = React.lazy(() => import("./component/Admin/Dashboard"));
 const LazyProductList = React.lazy(() =>
@@ -182,7 +183,6 @@ function App() {
               </>
             )}
           />
-
           <Route
             exact
             path="/verify-email"
@@ -428,6 +428,35 @@ function App() {
               </>
             )}
           />
+
+          <Route
+            exact
+            path="/process/payment/success"
+            render={() => (
+              <>
+                {<Header />}
+                <OrderSuccess />
+                <Services />
+                {<Footer />}
+              </>
+            )}
+          />
+
+          <Route
+            exact
+            path="/process/payment/failure"
+            render={() => (
+              <>
+                {<Header />}
+                <div style={{ padding: "3rem", textAlign: "center" }}>
+                  <h2>Payment Failed</h2>
+                  <p>There was an issue processing your payment. Please try again or choose another payment method.</p>
+                </div>
+                <Services />
+                {<Footer />}
+              </>
+            )}
+          />
         </Switch>
 
         {/* Admin routes */}
@@ -487,8 +516,7 @@ function App() {
               path="/admin/user/:id"
               component={LazyUpdateUser}
             />
-
-            <PrivateRoute
+             <PrivateRoute
               isAdmin={true}
               exact
               path="/admin/support-requests"

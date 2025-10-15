@@ -1,4 +1,5 @@
 import axios from "axios";
+import { toast } from "react-toastify";
 import {
   ALL_PRODUCT_REQUEST,
   ALL_PRODUCT_SUCCESS,
@@ -6,7 +7,7 @@ import {
   PRODUCT_DETAILS_REQUEST,
   PRODUCT_DETAILS_FAIL,
   PRODUCT_DETAILS_SUCCESS,
-  
+ 
   ADMIN_PRODUCT_FAIL,
   ADMIN_PRODUCT_REQUEST,
   ADMIN_PRODUCT_SUCCESS,
@@ -19,8 +20,9 @@ import {
   UPDATE_PRODUCT_REQUEST,
   UPDATE_PRODUCT_SUCCESS,
   UPDATE_PRODUCT_FAIL,
-
+ 
   CLEAR_ERRORS,
+
 } from "../constants/productsConstatns";
 
 // get ALL Products
@@ -81,7 +83,6 @@ export const getProductDetails = (id) => {
     }
   };
 };
-
 
 
 // admin product request :
@@ -171,7 +172,28 @@ export const updateProduct = (id, productData) => async (dispatch) => {
          }
        };
 
+ // Update product discount (admin)
+ export const updateProductDiscount = (productId, discountPercentage) => async (dispatch) => {
+   try {
+     dispatch({ type: "UPDATE_PRODUCT_DISCOUNT_REQUEST" });
+     const config = { headers: { "Content-Type": "application/json" } };
+     const { data } = await axios.put(
+       `/api/v1/admin/product/${productId}/discount`,
+       { discountPercentage },
+       config
+     );
+     dispatch({ type: "UPDATE_PRODUCT_DISCOUNT_SUCCESS", payload: data.product });
+     toast.success("Discount updated");
+   } catch (error) {
+     dispatch({
+       type: "UPDATE_PRODUCT_DISCOUNT_FAIL",
+       payload: error.response?.data?.message || error.message,
+     });
+     toast.error(error.response?.data?.message || error.message);
+   }
+ };
 
+ 
 
 // clear error
 export const clearErrors = () => async (dispatch) => {
