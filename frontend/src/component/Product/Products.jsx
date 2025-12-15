@@ -69,9 +69,15 @@ function Products() {
     setPrice(newPrice);
   };
 
-  const handleCategoryChange = (selectedCat) => {
-    setCategory(selectedCat);
-    setSelectedCategory(selectedCat);
+   const handleCategoryChange = (selectedCat) => {
+    // Toggle the category: if the clicked category is already selected, unselect it.
+    if (selectedCat === selectedCategory) {
+      setCategory("");
+      setSelectedCategory("");
+    } else {
+      setCategory(selectedCat);
+      setSelectedCategory(selectedCat);
+    }
   };
 
   const handleRatingChange = (event) => {
