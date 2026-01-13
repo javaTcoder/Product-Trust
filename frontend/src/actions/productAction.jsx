@@ -99,35 +99,44 @@ export const getAdminProducts = () => async (dispatch) => {
 };
 
 // Create Product
-export function createProduct(productData) {
-  return async function(dispatch) {
-    try {
-      dispatch({
-        type: NEW_PRODUCT_REQUEST,
-      });
-         
-      const config = {
-        headers: { "Content-Type": "multipart/form-data" },
-      };
+export const createProduct = (productData) => async (dispatch) => {
+  try {
+    dispatch({ type: NEW_PRODUCT_REQUEST });
 
-      const { data } = await axios.post(
-        `/api/v1/admin/product/new`,
-        productData,
-        config
-      );
+    console.log(
+      "createProduct payload type:",
+      productData instanceof FormData ? "FormData" : "JSON",
+      "images count:",
+      productData && productData.images ? (Array.isArray(productData.images) ? productData.images.length : "n/a") : 0
+    );
 
-      dispatch({
-        type: NEW_PRODUCT_SUCCESS,
-        payload: data,
-      });
-    } catch (error) {
-      dispatch({
-        type: NEW_PRODUCT_FAIL,
-        payload: error.message,
-      });
+    // If productData is FormData, don't force Content-Type. Let the browser set
+    // the multipart/form-data boundary. For JSON payloads, set application/json.
+    const config = { headers: {} };
+    if (!(productData instanceof FormData)) {
+      config.headers["Content-Type"] = "application/json";
     }
-  };
-}
+    const { data } = await axios.post("/api/v1/admin/product/new", productData, config);
+
+    dispatch({
+      type: NEW_PRODUCT_SUCCESS,
+      payload: data,
+    });
+  } catch (error) {
+    // Log the full server response (if any) for debugging
+    console.error("createProduct error response:", error.response ? error.response.data : error);
+    dispatch({
+      type: NEW_PRODUCT_FAIL,
+      payload:
+        (error.response && error.response.data && error.response.data.message) ||
+        (error.response && error.response.data) ||
+        error.message ||
+        "Something went wrong",
+    });
+  }
+};
+
+
 
 // Delete Product request
 

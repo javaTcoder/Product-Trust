@@ -354,7 +354,8 @@ const PaymentComponent = () => {
   const [couponCode, setCouponCode] = useState("");
   const [isValid, setIsValid] = useState(true);
   const [showDummyCard, setShowDummyCard] = useState(false);
-  const [selectedPayment, setSelectedPayment] = useState("card");
+  // default to COD only
+  const [selectedPayment, setSelectedPayment] = useState("cod");
   const razorpayRef = useRef();
 
   const subTotal = cartItems.reduce((acc, currItem) => {
@@ -407,142 +408,11 @@ const PaymentComponent = () => {
     const backendBase =
       process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
 
-    // 1. Handle PhonePe payment
-    if (selectedPayment === "phonepe") {
-      const merchantTransactionId = `order_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
-      // prefer user phone, fallback to shippingInfo
-      let userPhoneRaw =
-        (user && (user.phoneNo || user.mobile || user.phone)) ||
-        (shippingInfo && shippingInfo.phoneNo) ||
-        null;
-      // sanitize phone: trim and remove non-digits
-      const userPhone = userPhoneRaw ? String(userPhoneRaw).trim().replace(/\D/g, "") : null;
-
-      if (!userPhone) {
-        toast.error("Phone number required for PhonePe payment. Please add phone number in profile or shipping info.");
-        return;
-      }
-
-      // Redirect back to backend callback route that will verify and redirect to frontend
-      const redirectUrl = `${backendBase}/api/v1/payment/phonepe/return?merchantTransactionId=${encodeURIComponent(
-        merchantTransactionId
-      )}`;
-
-    try {
-       const payloadForBackend = {
-         merchantTransactionId,
-         amount: totalFinalPrice,
-         userPhone,
-         redirectUrl,
-       };
-       // log payload (without secrets) to help debug signature/key issues
-       console.info("[PhonePe] Initiating payment - payload:", { ...payloadForBackend, amount: payloadForBackend.amount });
-
-       const res = await axios.post(`${backendBase}/api/v1/payment/phonepe`, payloadForBackend, {
-         withCredentials: true,
-         timeout: 15000,
-       });
-       console.info("[PhonePe] Provider/initiate response status:", res.status, "data:", res.data);
-
-      if (
-        res.data &&
-        res.data.data &&
-        res.data.data.instrumentResponse &&
-        res.data.data.instrumentResponse.redirectInfo &&
-        res.data.data.instrumentResponse.redirectInfo.url
-      ) {
-        toast.info("Redirecting to PhonePe for payment...");
-        window.location.href = res.data.data.instrumentResponse.redirectInfo.url;
-        return;
-      } else {
-        toast.error("Failed to initiate PhonePe payment: invalid provider response.");
-        return;
-      }
-    } catch (err) {
-        // network / DNS / provider errors
-        const remote = err.response?.data || null;
-        if (err.message && err.message.includes("ENOTFOUND")) {
-          toast.error("PhonePe host not reachable (DNS lookup failed). Check network and backend URL.");
-        } else if (remote && remote.code === "401") {
-          toast.error("PhonePe payment error: Unauthorized (401). Check PhonePe merchant id / salt key, key index, and sandbox vs production endpoint.");
-          console.warn("[PhonePe] 401 response details:", remote);
-        } else if (remote) {
-          const msg = remote?.message || remote?.error || JSON.stringify(remote);
-          toast.error("PhonePe payment error: " + msg);
-          console.warn("[PhonePe] provider error:", remote);
-        } else {
-          toast.error("PhonePe payment error: " + (err.message || "Unknown error"));
-        }
-         return;
-       }
-     }
-
     // 2. Handle COD
     if (selectedPayment === "cod") {
       dispatch(createOrder({ ...order, paymentInfo: { id: "COD", status: "Pending" } }));
       toast.success("Order placed with Cash on Delivery!");
       history.push("/success");
-      return;
-    }
-
-    // 2.5. Handle Razorpay payment
-    if (selectedPayment === "razorpay") {
-      // Ensure Razorpay script is loaded
-      if (!window.Razorpay) {
-        const script = document.createElement("script");
-        script.src = "https://checkout.razorpay.com/v1/checkout.js";
-        script.async = true;
-        document.body.appendChild(script);
-        script.onload = () => paymentSubmitHandler(e); // retry after load
-        return;
-      }
-      try {
-        // Create order on backend to get order_id
-        const res = await axios.post(
-          `${backendBase}/api/v1/payment/razorpay`,
-          { amount: Math.round(totalFinalPrice * 100) },
-          { withCredentials: true }
-        );
-        const { order_id } = res.data;
-
-        const options = {
-          key: RAZORPAY_TEST_KEY,
-          amount: Math.round(totalFinalPrice * 100),
-          currency: "INR",
-          name: "CricketWeapon Store",
-          description: "Test Transaction",
-          image: "", // optional logo
-          order_id: order_id,
-          handler: function (response) {
-            // On successful payment
-            order.paymentInfo = {
-              id: response.razorpay_payment_id,
-              status: "succeeded",
-              method: "razorpay",
-            };
-            toast.success("Razorpay payment succeeded!");
-            dispatch(createOrder(order));
-            history.push("/success");
-          },
-          prefill: {
-            name: user.name,
-            email: user.email,
-            contact:
-              (user && (user.phoneNo || user.mobile || user.phone)) ||
-              (shippingInfo && shippingInfo.phoneNo) ||
-              "",
-          },
-          theme: {
-            color: "#3399cc",
-          },
-        };
-
-        const rzp = new window.Razorpay(options);
-        razorpayRef.current = rzp;
-        rzp.open();
-      } catch (err) {
-        toast.error("Razorpay payment error: " + (err.response?.data?.message || err.message));
-      }
       return;
     }
 
@@ -623,12 +493,13 @@ const PaymentComponent = () => {
 
   useEffect(() => {
     // Ensure Razorpay script is loaded
-    if (!window.Razorpay) {
-      const script = document.createElement("script");
-      script.src = "https://checkout.razorpay.com/v1/checkout.js";
-      script.async = true;
-      document.body.appendChild(script);
-    }
+    // if (!window.Razorpay) {
+    //   const script = document.createElement("script");
+    //   script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    //   script.async = true;
+    //   document.body.appendChild(script);
+    // }
+    // Razorpay and other handlers are hidden; no need to load scripts
     if (error) {
       toast.error(error);
       dispatch(clearErrors());
@@ -660,7 +531,7 @@ const PaymentComponent = () => {
  
         <div className={classes.payemntPage}>
           <CheckoutSteps activeStep={2} />
-          <MetaData title={"Payment"} />
+          <MetaData title={"Payment (COD only)"} />
           <div className={classes.paymentPage__container}>
             <div className={classes.PaymentBox}>
               <Typography
@@ -668,7 +539,7 @@ const PaymentComponent = () => {
                 component="h1"
                 className={classes.PaymentHeading}
               >
-                Payment method1
+                Payment method (COD only)
               </Typography>
               <Typography
                 variant="subtitle2"
@@ -681,152 +552,24 @@ const PaymentComponent = () => {
               </Typography>
 
               <div className={classes.cardContainer}>
-                <Typography variant="h6" className={classes.subHeading}>
-                  Credit Card <CreditCardIcon fontSize="medium" />
-                </Typography>
-                <Grid container spacing={2} className={classes.cardDetails}>
-                  <Grid item xs={12}>
-                    <Typography
-                      variant="subtitle2"
-                      className={classes.labelText}
-                    >
-                      Card number
-                    </Typography>
-                    <div className={classes.cardNumberInput}>
-                      <CardMembershipIcon className={classes.inputIcon} />
-                      <CardNumberElement className={classes.paymentInput} />
-                    </div>
-                  </Grid>
-                  <Grid item xs={12} container justifyContent="space-between">
-                    <Grid item className={classes.icons}>
-                      <MasterCard
-                        style={{
-                          width: "5%",
-                          height: "auto",
-                        }}
-                      />
-                      <Visa
-                        style={{
-                          width: "5%",
-                          height: "auto",
-                        }}
-                      />
-                      <Paytm
-                        style={{
-                          width: "5%",
-                          height: "auto",
-                        }}
-                      />
-                    </Grid>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography
-                      variant="subtitle2"
-                      className={classes.labelText}
-                    >
-                      EXPIRY DATE
-                    </Typography>
-                    <div className={classes.expiryInput}>
-                      <PaymentIcon className={classes.inputIcon} />
-                      <CardExpiryElement className={classes.paymentInput2} />
-                    </div>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography
-                      variant="subtitle2"
-                      className={classes.labelText}
-                    >
-                      CVV/CVV
-                    </Typography>
-                    <div className={classes.cvvInput}>
-                      <LockIcon className={classes.inputIcon} />
-                      <CardCvcElement className={classes.paymentInput2} />
-                    </div>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Typography
-                      variant="subtitle2"
-                      className={classes.labelText}
-                    >
-                      NAME ON CARD
-                    </Typography>
-                    <TextField
-                      placeholder="John Doe"
-                      variant="outlined"
-                      fullWidth
-                      className={classes.outlinedInput}
-                      value={nameOnCard}
-                      required
-                      onChange={handleNameOnCardChange}
-                    />
-                  </Grid>
-                </Grid>
-              </div>
+                {/* Card input hidden (COD only) */}
+               </div>
 
-
-              <div className={classes.cardSelection}>
-                <Radio
-                  value="card"
-                  className={classes.radio}
-                  checked={selectedPayment === "card"}
-                  onChange={() => setSelectedPayment("card")}
-                />
-                <Typography variant="subtitle2" className={classes.radioText}>
-                  Credit Card
-                </Typography>
-                <CreditCardIcon fontSize="medium" />
-              </div>
-              <div className={classes.cardSelection}>
-                <Radio
-                  value="dummyCard"
-                  className={classes.radio}
-                  checked={showDummyCard}
-                  onChange={handleRadioChange}
-                />
-                <Typography variant="subtitle2" className={classes.radioText}>
-                  Use dummy card
-                </Typography>
-                <CreditCardIcon fontSize="medium" />
-                {showDummyCard && <DummyCard onClose={handleCloseDummyCard} />}
-              </div>
 
               <div className={classes.cardSelection}>
                 <Radio
                   value="cod"
                   className={classes.radio}
-                  checked={showDummyCard === false && selectedPayment === "cod"}
+                  checked={selectedPayment === "cod"}
                   onChange={() => setSelectedPayment("cod")}
                 />
                 <Typography variant="subtitle2" className={classes.radioText}>
                   Cash on Delivery (COD)
                 </Typography>
               </div>
+              {/* Payment options hidden (only COD shown below) */}
+              
 
-              <div className={classes.cardSelection}>
-                <Radio
-                  value="phonepe"
-                  className={classes.radio}
-                  checked={selectedPayment === "phonepe"}
-                  onChange={() => setSelectedPayment("phonepe")}
-                />
-                <Typography variant="subtitle2" className={classes.radioText}>
-                  PhonePe
-                </Typography>
-                {/* You can add a PhonePe icon here if you want */}
-              </div>
-              {/* Razorpay option below PhonePe */}
-              <div className={classes.cardSelection}>
-                <Radio
-                  value="razorpay"
-                  className={classes.radio}
-                  checked={selectedPayment === "razorpay"}
-                  onChange={() => setSelectedPayment("razorpay")}
-                />
-                <Typography variant="subtitle2" className={classes.radioText}>
-                  Razorpay (Test)
-                </Typography>
-                {/* You can add a Razorpay icon here if you want */}
-              </div>
               <Typography
                 variant="body2"
                 className={classes.termsAndConditionsText}
