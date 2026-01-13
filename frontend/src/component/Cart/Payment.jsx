@@ -806,3 +806,4 @@ const PaymentComponent = () => {
 };
 
 export default PaymentComponent;
+//new updates
